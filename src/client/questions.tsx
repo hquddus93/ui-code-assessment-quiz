@@ -48,12 +48,14 @@ class QuestionsClass extends React.Component<Props, State> {
     }
 
     shuffleAnswers = () => {
-  
+        // displays answer choices in alphabetical order
         let question = this.state.quizQuestions[this.state.currentQuestion];
         let answerChoices = question.incorrect_answers?.concat(question.correct_answer);
+        debugger
         return answerChoices?.sort().map((ans, idx) => {
             const entities = new Entities();
             ans = entities.decode(ans)
+            debugger
             return (
             <>
                 <span>
@@ -79,7 +81,6 @@ class QuestionsClass extends React.Component<Props, State> {
             <br />
             {this.state.currentQuestion !== 9 ? <button onClick={this.handleClick}>NEXT</button> : <button onClick={this.checkAnswers}>Submit</button>} 
 
-            {/* <button onClick={this.handleClick}>NEXT</button> */}
         </div>
         )
     }
@@ -99,7 +100,7 @@ class QuestionsClass extends React.Component<Props, State> {
         </span>
         {this.state.currentQuestion !== 9 ? <button onClick={this.handleClick}>NEXT</button> : <button onClick={this.checkAnswers}>Submit</button>} 
         
-        {/* <button onClick={this.handleClick}>NEXT</button> */}
+
 
         </>)
 
@@ -114,7 +115,6 @@ class QuestionsClass extends React.Component<Props, State> {
             <p>{question}</p>
             <span>
                 <input onChange={this.update}/>
-                <button onClick={this.handleChange}>Submit</button>
             </span>
                 {this.state.currentQuestion !== 9 ? <button onClick={this.handleClick}>NEXT</button> : <button onClick={this.handleSubmit}>Submit</button>} 
             </>
@@ -147,6 +147,9 @@ class QuestionsClass extends React.Component<Props, State> {
     }
 
     handleClick = () => {
+    
+
+        debugger
         //next button 
         this.setState({
             currentQuestion: (this.state.currentQuestion + 1)
@@ -154,6 +157,10 @@ class QuestionsClass extends React.Component<Props, State> {
     }
 
     handleChange = (event:any) => {
+        // clicking an answer choice
+        let array = Array.from(event.target.parentElement.childNodes)
+
+
         debugger
         this.setState({submittedAnswers: this.state.submittedAnswers.concat([event.target.value])
         })
