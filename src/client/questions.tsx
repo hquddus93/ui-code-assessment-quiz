@@ -4,13 +4,13 @@ const styles = require('../stylesheets/styles.css')
 const Entities = require('html-entities').AllHtmlEntities;
 
 
-export interface Props { 
+interface Props { 
     compiler: string; 
     framework: string;
     
 }
 
-export interface Quest {
+interface Quest {
     category: string,
     type: string,
     difficulty: string,
@@ -20,7 +20,7 @@ export interface Quest {
 
 }
 
-export interface State {
+interface State {
     quests: Quest[],
     currentQuestion: number,
     quizQuestions: Quest[],
@@ -41,8 +41,8 @@ class QuestionsClass extends React.Component<Props, State> {
     }
 
     componentDidMount = () => {
-        // gives an array of 10 q's
-        while (this.state.quizQuestions.length < 5) {
+        // gives an array of X # q's
+        while (this.state.quizQuestions.length < 10) {
             let num = Math.floor(Math.random() * this.state.quests.length)
             if (!this.state.quizQuestions.includes(this.state.quests[num])) {
                 this.state.quizQuestions.push(this.state.quests[num])
@@ -58,18 +58,14 @@ class QuestionsClass extends React.Component<Props, State> {
         return answerChoices?.sort().map((ans, idx) => {
             const entities = new Entities();
             ans = entities.decode(ans)
-            let test = document.querySelectorAll('input[type=radio]');
-            debugger
-            return (
-            <>
-                <span>
-                    
-                    <input type='radio' key={idx} id={`ans-${idx}`} checked={this.state.selectedAnswer === ans} value={ans} name='answerChoice' onChange={this.handleChange}/> <label>{ans}</label>
-                    <br />
-
-                </span>
-                    
-            </>
+            let num = 0;
+            num++;
+            
+        return (
+            <span>
+                <input type='radio' key={num} checked={this.state.selectedAnswer === ans} value={ans} name='answerChoice' onChange={this.handleChange}/> <label>{ans}</label>
+                <br />
+            </span>
             )
 
         });
@@ -78,7 +74,7 @@ class QuestionsClass extends React.Component<Props, State> {
     }
 
     multipleChoice = () => {
- 
+        // renders MC question decoded
         const entities = new Entities();
         let question = entities.decode(this.state.quizQuestions[this.state.currentQuestion].question);
         return (
@@ -96,40 +92,39 @@ class QuestionsClass extends React.Component<Props, State> {
     }
 
     booleanQuestion = () => {
-  
+        // renders boolean question decoded
         const entities = new Entities();
         let question = entities.decode(this.state.quizQuestions[this.state.currentQuestion].question);
         return (
         <div>
-        <h3>{question}</h3>
-        <span>
-            <input type='radio' id='true' value="true" name='boolean' checked={this.state.selectedAnswer === 'true'} onChange={this.handleChange}/> <label>True</label>
-        </span>
-        <br />
-        <span>
-            <input type='radio' id='false' value="false" name='boolean' checked={this.state.selectedAnswer === 'false'} onChange={this.handleChange}/><label>False</label>
-        </span>
-        <br />
-        <p id='errors' className='hidden'>Answer is required</p>
-        <br />
+            <h3>{question}</h3>
+            <span>
+                <input type='radio' id='true' value="true" name='boolean' checked={this.state.selectedAnswer === 'true'} onChange={this.handleChange}/> <label>True</label>
+            </span>
+            <br />
+            <span>
+                <input type='radio' id='false' value="false" name='boolean' checked={this.state.selectedAnswer === 'false'} onChange={this.handleChange}/><label>False</label>
+            </span>
+            <br />
+            <p id='errors' className='hidden'>Answer is required</p>
+            <br />
 
-        {this.state.currentQuestion !== this.state.quizQuestions.length - 1 ? <button onClick={this.handleClick}>NEXT</button> : <button onClick={this.checkAnswers}>Submit</button>} 
+            {this.state.currentQuestion !== this.state.quizQuestions.length - 1 ? <button onClick={this.handleClick}>NEXT</button> : <button onClick={this.checkAnswers}>Submit</button>} 
         
-
-
-        </div>)
+        </div>
+        )
 
     }
 
     shortAnswer= () => {
-
+        // renders short answer q's decoded
         const entities = new Entities();
         let question = entities.decode(this.state.quizQuestions[this.state.currentQuestion].question);
         return (
             <div>
             <h3>{question}</h3>
             <span>
-                <input onChange={this.update} placeholder=""/>
+                <input onChange={this.update} placeholder="" value={this.state.field}/>
             </span>
             <br />
             <p id='errors' className='hidden'>Answer is required</p>
@@ -140,36 +135,36 @@ class QuestionsClass extends React.Component<Props, State> {
     }
 
     checkAnswers = () => {
+        // submits the last answer and makes sure error still renders if empty
         this.handleClick();
-
+        debugger;
         let count = 0;
         for (let i = 0; i < this.state.quizQuestions.length; i++) {
             if (this.state.submittedAnswers[i] === this.state.quizQuestions[i].correct_answer) {
+                // calculates # of correct answers
                 count += 1;
             }
         }
         return (
             <div>
                 <h3>Summary</h3>
-                 <p>Correct: {count}</p>
+                <p>Correct: {count}</p>
                 <p>Wrong: {this.state.quizQuestions.length - count}</p>
                 <p>Final Score: {count / this.state.quizQuestions.length * 100 }%</p>
                 <button onClick={() => window.location.reload()}>Retake Quiz</button>
             </div>
         )
-    
-    
-
-
     }
 
     renderErrors = () => {
+        // displays error message when user clicks next without putting an answer
         let error = document.getElementById('errors');
         error?.classList.remove('hidden');
         error?.classList.add('errors');
     }
 
     update = (field:any) => {
+        // updates state for short answer questions
         this.setState({
             field: field.target.value
         })
@@ -178,9 +173,10 @@ class QuestionsClass extends React.Component<Props, State> {
     }
 
     handleClick = () => {
-    
+        // checks to see if there is short answer stored in the state 
         if (this.state.field.length > 0) {
             this.setState({submittedAnswers: this.state.submittedAnswers.concat(this.state.field)})
+            // increments currentQuestion and resets state
             this.setState({
                 currentQuestion: (this.state.currentQuestion + 1),
                 field: "",
@@ -188,8 +184,10 @@ class QuestionsClass extends React.Component<Props, State> {
             });
         }
 
+        // checks to see if there is a MC/boolean answer stored in the state 
         if (this.state.selectedAnswer.length > 0) {
             this.setState({submittedAnswers: this.state.submittedAnswers.concat(this.state.selectedAnswer)})
+            // increments currentQuestion and resets state
             this.setState({
                 currentQuestion: (this.state.currentQuestion + 1),
                 field: "",
@@ -197,30 +195,22 @@ class QuestionsClass extends React.Component<Props, State> {
             });
         }
 
+        // skips error rendering on checkAnswers()
         if (this.state.selectedAnswer.length === 0 && this.state.field.length === 0 && this.state.currentQuestion < this.state.quizQuestions.length) {
 
             this.renderErrors();
-        }
-
-
-        //next button 
-   
+        }   
     }
 
     handleChange = (event:any) => {
-        // clicking an answer choice
-
+        // selecting an answer choice
         this.setState({selectedAnswer: event.target.value
         })
-
-
     }
 
 
      render () {
-
-        //  if else statements deciding which type of question to render
-
+        //  if else statements deciding which type of question to render or render summary
 
     this.componentDidMount();
          let error = document.getElementById('errors');
