@@ -1,0 +1,17 @@
+.hidden {
+    display: none;
+}
+
+.errors {
+    color: red;
+}
+
+button {
+    background-color: rgb(19, 133, 226);
+    padding: 10px 15px;
+    color: white;
+}
+
+div {
+    align-content: left;
+}
