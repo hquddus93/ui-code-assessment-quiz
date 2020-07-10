@@ -26,7 +26,8 @@ interface State {
     quizQuestions: Quest[],
     submittedAnswers: string[]
     field: string,
-    selectedAnswer: string
+    selectedAnswer: string,
+    key: number
 
 }
 
@@ -37,7 +38,8 @@ class QuestionsClass extends React.Component<Props, State> {
         quizQuestions: [],
         submittedAnswers: [],
         field: "",
-        selectedAnswer: ""
+        selectedAnswer: "",
+        key: 0
     }
 
     componentDidMount = () => {
@@ -58,12 +60,10 @@ class QuestionsClass extends React.Component<Props, State> {
         return answerChoices?.sort().map((ans, idx) => {
             const entities = new Entities();
             ans = entities.decode(ans)
-            let num = 0;
-            num++;
-            
+            this.state.key++
         return (
             <span>
-                <input type='radio' key={num} checked={this.state.selectedAnswer === ans} value={ans} name='answerChoice' onChange={this.handleChange}/> <label>{ans}</label>
+                <input type='radio' key={this.state.key + idx} checked={this.state.selectedAnswer === ans} value={ans} name='answerChoice' onChange={this.handleChange}/> <label>{ans}</label>
                 <br />
             </span>
             )
@@ -137,7 +137,6 @@ class QuestionsClass extends React.Component<Props, State> {
     checkAnswers = () => {
         // submits the last answer and makes sure error still renders if empty
         this.handleClick();
-        debugger;
         let count = 0;
         for (let i = 0; i < this.state.quizQuestions.length; i++) {
             if (this.state.submittedAnswers[i] === this.state.quizQuestions[i].correct_answer) {
